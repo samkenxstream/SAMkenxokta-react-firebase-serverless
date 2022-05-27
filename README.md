@@ -1,70 +1,130 @@
-# Getting Started with Create React App
+# Deploy a Node application to Firebase
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository shows you how to build a React application secured by Okta and deploy it to Firebase.  It also shows you how to set up Functions in Firebase to exchange and Okta accessToken for a Firebase token and then call a secured route using Firebase auth.
 
-## Available Scripts
+**Prerequisites:**
 
-In the project directory, you can run:
+- [Node.js](https://nodejs.org/en/)
+- [Firebase Account](https://firebase.google.com/)
+- [Firebase CLI](https://firebase.google.com/docs/cli)
+- [Okta CLI](https://cli.okta.com)
+> [Okta](https://developer.okta.com/) has Authentication and User Management APIs that reduce development time with instant-on, scalable user infrastructure. Okta's intuitive API and expert support make it easy for developers to authenticate, manage and secure users and roles in any application.
+- [Visual Studio Code](https://code.visualstudio.com/)
 
-### `npm start`
+* [Getting Started](#getting-started)
+* [Links](#links)
+* [Help](#help)
+* [License](#license)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Getting Started
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To pull this example, first create an empty github repo.  Next run the following commands:
 
-### `npm test`
+```bash
+git clone --bare https://github.com/nickolasfisher/okta-azure-static-web-app.git
+cd okta-firebase
+npm i
+cd functions
+npm i
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Create an OIDC Application in Okta
 
-### `npm run build`
+Create a free developer account with the following command using the [Okta CLI](https://cli.okta.com):
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```shell
+okta register
+```
+If you already have a developer account, use `okta login` to integrate it with the Okta CLI. 
+Create a client application in Okta with the following command:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```shell
+okta apps create
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+You will be prompted to select the following options:
+- Application name: Okta Firebase Demo
+- Type of Application: **2: SPA**
+- Callback: `http://localhost:5000/login/callback`
+- Post Logout Redirect URI: `http://localhost:5000`
 
-### `npm run eject`
+The application configuration will be printed in the terminal.  Note your `issuer` and your `clientId`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Replace all instances of {yourOktaIssuer} with the issuer from above.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Replace all instances of {yourClientId} with the clientId from above.  
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Create your Firebase Project
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+> Navigate to your [Firebase console](https://console.firebase.google.com/u/0/).
+> Click **Add Project** and follow the steps there
 
-## Learn More
+In your Project page
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+> Click **Authentication**
+> Click **Get Started**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+> Navigate To Project Settings (the settings wheel next to *Project Overview*)
+> Click **Add App** and follow the steps
+> Once you are done you will be shown a sample `firebaseConfig`  Add these values to .env in their appropiate spot
 
-### Code Splitting
+> Navigate To Project Settings (the settings wheel next to *Project Overview*)
+> Click **Service Accounts** and follow the steps
+> Click **Generate new private key**
+> Copy this key to your `functions` folder
+> Replace `{yourFirebaseKeysFile}` with the path to your file name
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Deploy your application
 
-### Analyzing the Bundle Size
+**In VS Code**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+From your `okta-firebase` directory
 
-### Making a Progressive Web App
+> Run the command `firebase init`
+> Select `Functions: Configure a Cloud Functions directory and its files` and `Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys`
+> Select `Use an existing project` and select the project you created above
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Functions will start to init
 
-### Advanced Configuration
+> Select JavaScript for the language
+> Select no for EsLint
+> Select no for each time it asks you to overwrite a file
+> Select Y to install dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Next Hosting will start
 
-### Deployment
+> Type in `build` as your public directory
+> Select `yes` to configure your app as a single-page app
+> Select `no` to set up automatic builds
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Next run the command `firebase deploy` and your application should deploy your project.  The CLI will give you a URL to navigate to.
 
-### `npm run build` fails to minify
+### Configure your Okta application with your new Firebase domain
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+In your Okta admin panle
+Naviagte to *Security -> API*
+Click on **Trusted Origins**
+Add your Firebase domain to this list
+
+Navigate to your Okta application
+Click **Edit** and add {yourFirebaseDomain}/login/callback to the *Sign-in Redirect URIs* and {yourFirebaseDomain} to *Sign-out redirect URIs*
+Click **Save**
+
+## Links
+
+This example uses the following open source libraries from Okta:
+
+* [Okta with NodeJs](https://developer.okta.com/code/nodejs/)
+* [Okta with React](https://developer.okta.com/code/react/)
+* [Okta JWT Verifier](https://github.com/okta/okta-oidc-js/tree/master/packages/jwt-verifier)
+* [Okta CLI](https://github.com/okta/okta-cli)
+
+## Help
+
+Please post any questions as comments on the [blog post][blog], or visit our [Okta Developer Forums](https://devforum.okta.com/).
+
+## License
+
+Apache 2.0, see [LICENSE](LICENSE).
+
+[blog]: https://developer.okta.com/blog/2021/xyz
