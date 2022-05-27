@@ -97,6 +97,8 @@ Next Hosting will start
 > Select `yes` to configure your app as a single-page app
 > Select `no` to set up automatic builds
 
+Update your `.env` file to replace the stub values with your Firebase and Okta settings
+
 Next run the command `firebase deploy` and your application should deploy your project.  The CLI will give you a URL to navigate to.
 
 ### Configure your Okta application with your new Firebase domain
