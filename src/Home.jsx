@@ -12,17 +12,13 @@ import {
 
 function Home() {
   const [reportCardData, setReportCardData] = useState();
-  const [nonce, setNonce] = useState("test");
   const [selectedSemester, setSelectedSemester] = useState("Spring 2022");
   const { oktaAuth, authState } = useOktaAuth();
 
-  const login = async () =>
-    oktaAuth.signInWithRedirect({
-      nonce: nonce,
-    });
+  const login = async () => oktaAuth.signInWithRedirect();
   const logout = async () => {
+    signOut(auth);
     oktaAuth.signOut("/");
-    signOut();
   };
 
   const {
@@ -64,17 +60,13 @@ function Home() {
   };
 
   const exchangeOktaTokenForFirebaseToken = async () => {
-    const idTokenResp = await oktaAuth.getIdToken();
-
     const exchangeToken = httpsCallable(
       functions,
       "exchangeOktaTokenForFirebaseToken"
     );
 
     const resp = await exchangeToken({
-      accessToken: authState.accessToken.accessToken,
-      idToken: idTokenResp,
-      nonce: nonce,
+      accessToken: authState.accessToken.accessToken
     });
 
     await signInWithCustomToken(auth, resp.data.firebaseToken);
@@ -174,7 +166,7 @@ function Home() {
                     {reportCardData.grades.map((grade, i) => {
                       return (
                         <tr key={i}>
-                          <td>{grade.course}</td>
+                          <td className="text-start">{grade.course}</td>
                           <td>{grade.score}</td>
                           <td>{grade.letterGrade}</td>
                         </tr>

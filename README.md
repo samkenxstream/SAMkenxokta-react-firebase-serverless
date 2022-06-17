@@ -1,6 +1,8 @@
-# Deploy a Node application to Firebase
+# Build a React App with Firebase Serverless Functions
 
 This repository shows you how to build a React application secured by Okta and deploy it to Firebase.  It also shows you how to set up Functions in Firebase to exchange and Okta accessToken for a Firebase token and then call a secured route using Firebase auth.
+
+Please read [Build a React App with Firebase Serverless Functions][blog] to see how it was created.
 
 **Prerequisites:**
 
@@ -21,11 +23,11 @@ This repository shows you how to build a React application secured by Okta and d
 To pull this example, first create an empty github repo.  Next run the following commands:
 
 ```bash
-git clone --bare https://github.com/nickolasfisher/okta-azure-static-web-app.git
-cd okta-firebase
-npm i
+git clone --bare https://github.com/oktadev/okta-react-firebase-serverless-example.git
+cd okta-react-firebase-serverless-example
+npm ci
 cd functions
-npm i
+npm ci
 ```
 
 ### Create an OIDC Application in Okta
@@ -35,6 +37,7 @@ Create a free developer account with the following command using the [Okta CLI](
 ```shell
 okta register
 ```
+
 If you already have a developer account, use `okta login` to integrate it with the Okta CLI. 
 Create a client application in Okta with the following command:
 
@@ -45,14 +48,18 @@ okta apps create
 You will be prompted to select the following options:
 - Application name: Okta Firebase Demo
 - Type of Application: **2: SPA**
-- Callback: `http://localhost:5000/login/callback`
-- Post Logout Redirect URI: `http://localhost:5000`
+- Callback: `http://localhost:3000/login/callback`
+- Post Logout Redirect URI: `http://localhost:3000`
 
-The application configuration will be printed in the terminal.  Note your `issuer` and your `clientId`.
+The application configuration will be printed in the terminal. You will see output like the following when it's finished:
 
-Replace all instances of {yourOktaIssuer} with the issuer from above.
+```console
+Okta application configuration:
+Issuer:    https://{yourOktaDomain}/oauth2/default
+Client ID: {yourClientID}
+```
 
-Replace all instances of {yourClientId} with the clientId from above.  
+Replace all instances of {yourOktaDomain} and {yourClientID} in the project.
 
 ### Create your Firebase Project
 
@@ -78,11 +85,12 @@ In your Project page
 
 **In VS Code**
 
-From your `okta-firebase` directory
+From your `okta-react-firebase-serverless-example` directory
 
 > Run the command `firebase init`
-> Select `Functions: Configure a Cloud Functions directory and its files` and `Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys`
-> Select `Use an existing project` and select the project you created above
+> Select the following two options:
+>  * Select `Functions: Configure a Cloud Functions directory and its files` and `Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys`
+>  * Select `Use an existing project` and select the project you created above
 
 Functions will start to init
 
@@ -129,4 +137,4 @@ Please post any questions as comments on the [blog post][blog], or visit our [Ok
 
 Apache 2.0, see [LICENSE](LICENSE).
 
-[blog]: https://developer.okta.com/blog/2021/xyz
+[blog]: https://developer.okta.com/blog/2022/xyz
